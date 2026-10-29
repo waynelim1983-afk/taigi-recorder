@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>台語錄音清單</title>
+<meta name="description" content="協助台語語音輸入測試：照著 20 句國語，用台語說出來並錄音。錄音只存在你的手機，不會自動上傳。">
+<meta name="robots" content="noindex">
+<style>
+  :root {
+    --bg: #f6f7f5; --fg: #1c2321; --muted: #5a6662; --card: #ffffff; --line: #d6dcd8;
+    --accent: #1f6f66; --accent-fg: #ffffff; --warn-bg: #fff1d6; --warn-fg: #5b3c00;
+    --done: #e3f0ec; --bad: #a3321f; --rec: #b4322a;
+    --font: "Noto Sans TC", system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141816; --fg: #eef2ef; --muted: #9fada8; --card: #1d2320; --line: #323b37;
+      --accent: #5cc2b3; --accent-fg: #0d1a17; --warn-bg: #3a2f14; --warn-fg: #f3d9a0;
+      --done: #1b302b; --bad: #ff9c8a; --rec: #e0594f; color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 18px; line-height: 1.7;
+    padding-block: max(24px, env(safe-area-inset-top, 0px)) calc(80px + env(safe-area-inset-bottom, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  main { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+  h1 { font-size: 30px; line-height: 1.3; margin: 0 0 6px; text-wrap: balance; }
+  h2 { font-size: 22px; margin: 0 0 10px; text-wrap: balance; }
+  h3 { font-size: 18px; margin: 14px 0 4px; }
+  p { margin: 0; }
+  p + p { margin-top: 8px; }
+  .lead { color: var(--muted); }
+  .box { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+  .box ul, .box ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 6px; }
+  .note { background: var(--warn-bg); color: var(--warn-fg); border-radius: 12px; padding: 14px 16px; }
+  .note.bad { background: var(--bad); color: #fff; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 18px; }
+  summary { cursor: pointer; padding: 12px 0; font-weight: 600; min-height: 48px; }
+  details[open] summary { border-bottom: 1px solid var(--line); margin-bottom: 10px; }
+  details > div { padding-bottom: 14px; }
+  code { font-family: ui-monospace, Consolas, monospace; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; font-size: .92em; }
+  label.field { display: flex; flex-direction: column; gap: 4px; font-size: 16px; color: var(--muted); }
+  .fields { display: flex; flex-direction: column; gap: 14px; }
+  select, input[type="text"] { font: inherit; font-size: 18px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; min-width: 0; }
+  .check { display: flex; gap: 10px; align-items: center; font-size: 16px; color: var(--muted); }
+  .check input { width: 22px; height: 22px; accent-color: var(--accent); }
+  .group { display: flex; flex-direction: column; gap: 10px; }
+  .group h2 small { display: block; font-size: 15px; font-weight: 400; color: var(--muted); margin-top: 2px; }
+  .row { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: grid; grid-template-columns: 34px 1fr; gap: 6px 12px; }
+  .row.done { background: var(--done); }
+  .tick { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--line); margin-top: 3px; display: grid; place-items: center; color: transparent; font-size: 18px; font-weight: 700; line-height: 1; }
+  .row.done .tick { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+  .txt { font-size: 22px; line-height: 1.5; min-width: 0; overflow-wrap: anywhere; }
+  .txt small { display: block; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .acts { grid-column: 2; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 4px; }
+  .btn { font: inherit; font-size: 18px; border: 1px solid var(--line); background: var(--card); color: var(--fg); border-radius: 12px; padding: 10px 18px; cursor: pointer; min-height: 52px; text-align: center; }
+  .btn.main { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); font-weight: 600; }
+  .btn.quiet { color: var(--muted); }
+  .btn.rec { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; min-width: 170px; }
+  .btn.live { background: var(--rec); border-color: var(--rec); color: #fff; font-weight: 600; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .btn:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  audio { width: 100%; height: 40px; }
+  .bar { position: sticky; top: 0; background: var(--bg); padding: 10px 0; z-index: 2; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); }
+  .meter { flex: 1; height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; }
+  .meter span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+  #count { font-variant-numeric: tabular-nums; font-size: 16px; white-space: nowrap; }
+  #all { display: none; background: var(--accent); color: var(--accent-fg); border-radius: 12px; padding: 14px 16px; font-weight: 600; }
+  #status { position: sticky; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 3; display: none; background: var(--fg); color: var(--bg); border-radius: 12px; padding: 10px 14px; font-size: 16px; }
+  #msg { min-height: 1.5em; color: var(--muted); }
+  #msg.err, .err { color: var(--bad); }
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { .meter span { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>台語錄音清單</h1>
+    <p class="lead">請看每一句國語，用你平常講話的台語說出來，錄成聲音。共 20 句，約 10 到 15 分鐘。</p>
+  </header>
+
+  <section class="box">
+    <h2>這是在做什麼</h2>
+    <p>這是一個個人的小專案：做一個能聽懂台語、直接在手機鍵盤上轉成國語文字的語音輸入工具，給家裡不太會打字的長輩用。要知道它聽得準不準，需要不同的人用台語念同樣的句子。你的錄音只拿來測試辨識結果，不會公開。</p>
+    <p>這不是公司、政府或學校的服務，也不是醫療建議。</p>
+  </section>
+
+  <section class="box">
+    <h2>你的錄音會去哪裡</h2>
+    <ul>
+      <li>錄音<strong>只存在你這支手機的瀏覽器裡</strong>。這個網頁沒有伺服器接收錄音，也沒有任何自動上傳。</li>
+      <li>最後你自己按「打包」，存成一個檔案，再<strong>自己決定要傳給誰</strong>（請傳給邀請你的人）。</li>
+      <li>網頁沒有統計工具，也不載入外部程式。頁面由 GitHub Pages 提供，GitHub 可能記錄一般的連線資訊，但錄音不會經過它。</li>
+      <li>想反悔很簡單：每一句都可以刪除；關掉網頁、清除瀏覽器資料，錄音就沒了；還沒傳給對方之前，什麼都不會離開你的手機。</li>
+      <li>上面填的代號、年齡層、性別、成長縣市和手機型號，<strong>只用來分析辨識結果</strong>（例如年長者或不同地區的口音準不準），不會公開，也不會用來找出你是誰。這些欄位都可以不選，只有代號一定要填。</li>
+      <li>錄音裡只會有你的聲音和背景聲。請不要唸出自己或別人的真實個資。</li>
+    </ul>
+  </section>
+
+  <section class="box">
+    <h2>開始前</h2>
+    <ul>
+      <li>找一個<strong>安靜</strong>的地方，關掉電視和音樂。</li>
+      <li>手機拿在嘴巴前約<strong>一個拳頭</strong>的距離。<strong>不要用藍牙耳機</strong>，收音會變差。</li>
+      <li>第一次按錄音，手機會問能不能使用麥克風，請按「允許」。</li>
+      <li>如果你是從 LINE、Facebook 等 App 裡點開這個連結，錄音可能會失敗。請改用手機的 <strong>Safari（iPhone）或 Chrome（Android）</strong>開啟。</li>
+    </ul>
+  </section>
+
+  <div class="note" id="inapp" hidden><strong>你好像是在 App 內建的瀏覽器開啟的。</strong>這種瀏覽器常常不能錄音。請按右上角或右下角的選單，選「用瀏覽器開啟」（Safari 或 Chrome）。</div>
+  <div class="note bad" id="nomic" hidden>這個瀏覽器不支援錄音。請改用 Safari（iPhone）或 Chrome（Android）。</div>
+
+  <section class="box">
+    <h2>先填基本資料</h2>
+    <div class="fields">
+      <label class="field">代號（邀請你的人會給你，例如 A1。用英文和數字）
+        <input type="text" id="code" maxlength="8" autocomplete="off" autocapitalize="characters">
+      </label>
+      <label class="field">年齡層
+        <select id="age"><option value="">請選擇</option><option>20 歲以下</option><option>20–29</option><option>30–39</option><option>40–49</option><option>50–59</option><option>60–69</option><option>70–79</option><option>80 以上</option></select>
+      </label>
+      <label class="field">性別
+        <select id="gender"><option value="">請選擇</option><option>女</option><option>男</option><option>其他／不想說</option></select>
+      </label>
+      <label class="field">主要在哪個縣市長大（口音會受影響）
+        <select id="home"><option value="">請選擇</option><option>基隆</option><option>台北</option><option>新北</option><option>桃園</option><option>新竹</option><option>苗栗</option><option>台中</option><option>彰化</option><option>南投</option><option>雲林</option><option>嘉義</option><option>台南</option><option>高雄</option><option>屏東</option><option>宜蘭</option><option>花蓮</option><option>台東</option><option>澎湖</option><option>金門／馬祖</option><option>國外</option></select>
+      </label>
+      <label class="field">你用的手機型號（例如 iPhone 13、Samsung A54）
+        <input type="text" id="phone" maxlength="40" autocomplete="off">
+      </label>
+    </div>
+  </section>
+
+  <section class="box">
+    <h2>怎麼錄</h2>
+    <ol>
+      <li>看一句國語，想一下你會怎麼用台語說。</li>
+      <li><strong>按住</strong>該句的紅色按鈕開始說，說完<strong>放開</strong>，這一句就錄好了，並自動打勾。</li>
+      <li>可以按播放聽聽看。說錯了就按「重錄」。</li>
+      <li>用你<strong>平常的說法</strong>，不用逐字翻譯，也不用講得字正腔圓。每句只說一次。</li>
+      <li>20 句錄完，往下按「打包」。</li>
+    </ol>
+    <p class="check" style="margin-top:12px"><input type="checkbox" id="tapmode"><label for="tapmode">按住不方便？改成「按一下開始，再按一下結束」</label></p>
+  </section>
+
+  <div class="bar" id="bar">
+    <div class="meter" aria-hidden="true"><span id="fill"></span></div>
+    <span id="count">0 / 20</span>
+  </div>
+  <div id="all">20 句全部錄完了，請往下按「打包」。</div>
+
+  <div id="list" style="display:flex;flex-direction:column;gap:28px"></div>
+
+  <section class="box" id="pack">
+    <h2>打包給邀請你的人</h2>
+    <p>按下面的按鈕，會把所有錄音打包成一個 <code>.zip</code> 檔存在手機裡。然後請用 LINE 或 Google 雲端硬碟，把這個檔案傳給邀請你的人。沒錄完也可以先打包，之後補錄再打包一次。</p>
+    <p style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap">
+      <button class="btn main" id="zip" type="button">打包並存到手機</button>
+      <button class="btn" id="share" type="button" hidden>打包並用 LINE 等 App 分享</button>
+    </p>
+    <p id="msg" style="margin-top:12px" role="status"></p>
+  </section>
+
+  <section class="faq" style="display:flex;flex-direction:column;gap:10px">
+    <h2>常見問題</h2>
+    <details><summary>按了錄音，沒有反應或說不能使用麥克風</summary>
+      <div><p>請到手機的「設定」，找到你用的瀏覽器（Safari 或 Chrome），把「麥克風」打開。iPhone 要到 設定 → Safari → 麥克風。改好後回到這個網頁重新整理。</p></div></details>
+    <details><summary>按住的時候畫面跳出選單或選取文字</summary>
+      <div><p>請把上面的「改成按一下開始，再按一下結束」打勾，這樣就不用一直按住。</p></div></details>
+    <details><summary>我中途離開，錄音會不見嗎</summary>
+      <div><p>通常不會。錄音和勾選會留在這支手機的瀏覽器裡，下次用同一個瀏覽器打開同一個連結就會看到。但如果你清除了瀏覽器資料，或用「無痕模式」，就會消失。</p></div></details>
+    <details><summary>打包存檔後找不到檔案</summary>
+      <div><p>Android 通常在「下載」資料夾。iPhone 在「檔案」App 的「下載項目」。也可以改按「用 LINE 等 App 分享」，直接選要傳給誰。</p></div></details>
+    <details><summary>檔案很大嗎</summary>
+      <div><p>20 句大約幾 MB 到十幾 MB，用 Wi-Fi 傳比較不吃流量。</p></div></details>
+    <details><summary>我不想錄了</summary>
+      <div><p>直接關掉網頁就好。沒有按打包、沒有傳給任何人，就沒有任何東西離開你的手機。</p></div></details>
+  </section>
+</main>
+<div id="status" role="status" aria-live="polite"></div>
+
+<script src="jszip.min.js"></script>
+<script>
+(function () {
+  var GROUPS = [
+    { t: "A　用藥與看病", s: "這幾句最重要，請講清楚一點", items: [
+      "這個藥要飯後吃，一天三次。", "這個藥要飯前吃。", "睡前吃一顆。",
+      "三天後要回診。", "這個藥早上吃，晚上不用吃。", "我吃了藥還是會頭暈。" ] },
+    { t: "B　身體不舒服", s: "", items: [
+      "我肚子痛，從昨天開始。", "我的腳會麻，走路不太方便。",
+      "我血壓好像比較高。", "我胸口悶悶的。" ] },
+    { t: "C　日常生活", s: "", items: [
+      "你吃飽了嗎？", "今天天氣很冷，記得多穿衣服。", "明天下雨，記得帶傘。",
+      "這個多少錢？", "太貴了，可以算便宜一點嗎？" ] },
+    { t: "D　家人與聯絡", s: "", items: [
+      "你什麼時候回來？", "幫我打電話給我兒子。", "我年紀大了，你講慢一點我才聽得懂。",
+      "今天晚上我要早點睡。", "我找不到我的眼鏡。" ] }
+  ];
+  var TOTAL = 20, MAX_SEC = 25, MIN_MS = 600;
+  var recs = {}, urls = {}, rows = {}, stream = null, active = null;
+  var ua = navigator.userAgent || "";
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---- environment checks ---- */
+  if (/Line\/|FBAN|FBAV|Instagram|MicroMessenger|; wv\)/i.test(ua)) $("inapp").hidden = false;
+  var canRecord = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+  if (!canRecord) $("nomic").hidden = false;
+
+  /* ---- storage helpers (all optional) ---- */
+  function lsGet(k) { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  var dbp = null;
+  function idb() {
+    if (dbp) return dbp;
+    dbp = new Promise(function (res) {
+      try {
+        var r = indexedDB.open("taigi-rec", 1);
+        r.onupgradeneeded = function () { r.result.createObjectStore("recs"); };
+        r.onsuccess = function () { res(r.result); };
+        r.onerror = function () { res(null); };
+      } catch (e) { res(null); }
+    });
+    return dbp;
+  }
+  function idbPut(k, v) { return idb().then(function (db) { if (db) try { db.transaction("recs", "readwrite").objectStore("recs").put(v, k); } catch (e) {} }); }
+  function idbDel(k) { return idb().then(function (db) { if (db) try { db.transaction("recs", "readwrite").objectStore("recs").delete(k); } catch (e) {} }); }
+  function idbAll() {
+    return idb().then(function (db) {
+      return new Promise(function (res) {
+        if (!db) return res({});
+        var out = {};
+        try {
+          var req = db.transaction("recs").objectStore("recs").openCursor();
+          req.onsuccess = function () { var c = req.result; if (c) { out[c.key] = c.value; c.continue(); } else res(out); };
+          req.onerror = function () { res(out); };
+        } catch (e) { res(out); }
+      });
+    });
+  }
+
+  var statusTimer = null;
+  function status(t, ms) {
+    var el = $("status"); el.textContent = t; el.style.display = t ? "block" : "none";
+    clearTimeout(statusTimer); if (t && ms) statusTimer = setTimeout(function () { el.style.display = "none"; }, ms);
+  }
+
+  /* ---- recording ---- */
+  function pickMime() {
+    var c = ["audio/mp4;codecs=mp4a.40.2", "audio/mp4", "audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus"];
+    for (var i = 0; i < c.length; i++) { try { if (MediaRecorder.isTypeSupported(c[i])) return c[i]; } catch (e) {} }
+    return "";
+  }
+  function extFor(m) { m = (m || "").toLowerCase(); return m.indexOf("mp4") >= 0 ? "m4a" : m.indexOf("webm") >= 0 ? "webm" : m.indexOf("ogg") >= 0 ? "ogg" : "m4a"; }
+  async function getStream() {
+    if (stream && stream.getTracks().every(function (t) { return t.readyState === "live"; })) return stream;
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1 } });
+    return stream;
+  }
+  function micError(e) {
+    var n = e && e.name;
+    if (n === "NotAllowedError" || n === "SecurityError") return "沒有麥克風權限。請到手機設定把瀏覽器的「麥克風」打開，再重新整理本頁。";
+    if (n === "NotFoundError") return "找不到麥克風。";
+    return "無法開始錄音（" + (n || "未知原因") + "）。";
+  }
+  async function start(id, btn) {
+    if (active) return;
+    var pressed = true; btn._pressed = true;
+    var s;
+    try { s = await getStream(); } catch (e) { status(micError(e)); return; }
+    if (!btn._pressed && !btn._tap) { status("麥克風已允許。請再按住一次開始錄。", 4000); return; }
+    var mime = pickMime(), rec;
+    try { rec = mime ? new MediaRecorder(s, { mimeType: mime }) : new MediaRecorder(s); } catch (e) { status("這個瀏覽器無法錄音。"); return; }
+    var chunks = [], t0 = Date.now();
+    active = { id: id, rec: rec, btn: btn };
+    rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) chunks.push(ev.data); };
+    rec.onstop = function () {
+      clearTimeout(active && active.timer);
+      var a = active; active = null;
+      btn.classList.remove("live"); btn.textContent = "按住錄音";
+      var dur = Date.now() - t0;
+      if (dur < MIN_MS || !chunks.length) { status("按太快了，沒有錄到。請再試一次。", 3500); return; }
+      var type = rec.mimeType || mime || "audio/mp4";
+      var blob = new Blob(chunks, { type: type });
+      save(id, blob, type);
+      status("第 " + id + " 句已錄好。", 2500);
+    };
+    rec.start();
+    active.timer = setTimeout(function () { stopActive(); status("錄滿 " + MAX_SEC + " 秒，已自動停止。", 3500); }, MAX_SEC * 1000);
+    btn.classList.add("live"); btn.textContent = $("tapmode").checked ? "錄音中…再按一下結束" : "錄音中…放開就結束";
+  }
+  function stopActive() { if (active && active.rec.state === "recording") active.rec.stop(); }
+
+  function save(id, blob, type) {
+    if (urls[id]) { try { URL.revokeObjectURL(urls[id]); } catch (e) {} }
+    recs[id] = { blob: blob, type: type, ext: extFor(type) };
+    urls[id] = URL.createObjectURL(blob);
+    idbPut(id, recs[id]); draw(id); update();
+  }
+  function remove(id) {
+    if (urls[id]) { try { URL.revokeObjectURL(urls[id]); } catch (e) {} }
+    delete urls[id]; delete recs[id]; idbDel(id); draw(id); update();
+  }
+
+  /* ---- list UI ---- */
+  var list = $("list"), n = 0;
+  GROUPS.forEach(function (g) {
+    var sec = document.createElement("section"); sec.className = "group";
+    var h = document.createElement("h2"); h.textContent = g.t;
+    if (g.s) { var sm = document.createElement("small"); sm.textContent = g.s; h.appendChild(sm); }
+    sec.appendChild(h);
+    g.items.forEach(function (text) {
+      n++;
+      var id = String(n).padStart(2, "0");
+      var row = document.createElement("div"); row.className = "row";
+      var tick = document.createElement("div"); tick.className = "tick"; tick.textContent = "✓"; tick.setAttribute("aria-hidden", "true");
+      var tx = document.createElement("div"); tx.className = "txt"; tx.textContent = text;
+      var sub = document.createElement("small"); sub.textContent = "第 " + id + " 句"; tx.appendChild(sub);
+      var acts = document.createElement("div"); acts.className = "acts";
+      row.appendChild(tick); row.appendChild(tx); row.appendChild(acts); sec.appendChild(row);
+      rows[id] = { row: row, acts: acts }; draw(id);
+    });
+    list.appendChild(sec);
+  });
+
+  function draw(id) {
+    var r = rows[id], acts = r.acts, has = !!recs[id];
+    acts.textContent = ""; r.row.classList.toggle("done", has);
+    var b = document.createElement("button"); b.type = "button";
+    b.className = "btn rec" + (has ? "" : " main"); b.textContent = has ? "按住重錄" : "按住錄音"; b.disabled = !canRecord;
+    b.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+    b.addEventListener("pointerdown", function (e) {
+      if ($("tapmode").checked) return;
+      e.preventDefault(); try { b.setPointerCapture(e.pointerId); } catch (x) {}
+      b._tap = false; start(id, b);
+    });
+    var up = function () { if ($("tapmode").checked) return; b._pressed = false; if (active && active.btn === b) stopActive(); };
+    b.addEventListener("pointerup", up); b.addEventListener("pointercancel", up);
+    b.addEventListener("click", function () {
+      if (!$("tapmode").checked) return;
+      if (active && active.btn === b) { stopActive(); } else if (!active) { b._tap = true; b._pressed = true; start(id, b); }
+    });
+    acts.appendChild(b);
+    if (has) {
+      var del = document.createElement("button"); del.type = "button"; del.className = "btn quiet"; del.textContent = "刪除";
+      del.addEventListener("click", function () { remove(id); });
+      acts.appendChild(del);
+      var au = document.createElement("audio"); au.controls = true; au.preload = "none"; au.src = urls[id]; acts.appendChild(au);
+    }
+  }
+  function update() {
+    var c = Object.keys(recs).length;
+    $("count").textContent = c + " / " + TOTAL;
+    $("fill").style.width = (c / TOTAL * 100) + "%";
+    $("all").style.display = c === TOTAL ? "block" : "none";
+  }
+  $("tapmode").checked = lsGet("taigi-tap") === "1";
+  $("tapmode").addEventListener("change", function () { lsSet("taigi-tap", this.checked ? "1" : "0"); });
+  ["code", "age", "gender", "home", "phone"].forEach(function (f) { var el = $(f); el.value = lsGet("taigi-" + f); el.addEventListener("input", function () { lsSet("taigi-" + f, el.value); }); });
+
+  idbAll().then(function (all) {
+    Object.keys(all).forEach(function (id) {
+      if (!rows[id] || !all[id] || !all[id].blob) return;
+      recs[id] = all[id]; urls[id] = URL.createObjectURL(all[id].blob); draw(id);
+    });
+    update();
+  });
+  update();
+
+  /* ---- zip ---- */
+  var msg = $("msg");
+  function say(t, bad) { msg.textContent = t; msg.className = bad ? "err" : ""; }
+  async function build() {
+    var code = $("code").value.trim().replace(/[^A-Za-z0-9]/g, "");
+    if (!code) { say("請先在上面填「代號」。", true); $("code").focus(); return null; }
+    var ids = Object.keys(recs).sort();
+    if (!ids.length) { say("還沒有錄音。", true); return null; }
+    var zip = new JSZip(), missing = [], types = {};
+    ids.forEach(function (id) { zip.file(code + "_" + id + "." + recs[id].ext, recs[id].blob); types[recs[id].type] = 1; });
+    for (var i = 1; i <= TOTAL; i++) { var k = String(i).padStart(2, "0"); if (!recs[k]) missing.push(k); }
+    var info = "代號: " + code + "\n年齡層: " + $("age").value + "\n性別: " + $("gender").value + "\n成長縣市: " + $("home").value + "\n手機: " + $("phone").value + "\n已錄: " + ids.length + " / " + TOTAL +
+               "\n未錄的句號: " + (missing.join(", ") || "無") + "\n格式: " + Object.keys(types).join(", ") +
+               "\n時間: " + new Date().toISOString() + "\n瀏覽器: " + ua + "\n";
+    zip.file(code + "_info.txt", info);
+    var blob = await zip.generateAsync({ type: "blob", compression: "STORE" });
+    return { blob: blob, name: code + ".zip", missing: missing, code: code };
+  }
+  function tail(m) { return m.length ? "（還有 " + m.length + " 句沒錄，之後可以補錄再打包一次。）" : ""; }
+  $("zip").addEventListener("click", async function () {
+    var b = this; b.disabled = true; say("打包中…");
+    try {
+      var r = await build(); if (!r) { b.disabled = false; return; }
+      var u = URL.createObjectURL(r.blob), a = document.createElement("a");
+      a.href = u; a.download = r.name; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(u); }, 60000);
+      say("已打包 " + r.name + "，請到「下載」找到它，再傳給邀請你的人。" + tail(r.missing));
+    } catch (e) { say("打包失敗：" + (e && e.message || e), true); }
+    b.disabled = false;
+  });
+  var shareBtn = $("share");
+  try { if (navigator.canShare && navigator.canShare({ files: [new File(["x"], "x.zip", { type: "application/zip" })] })) shareBtn.hidden = false; } catch (e) {}
+  shareBtn.addEventListener("click", async function () {
+    var b = this; b.disabled = true; say("打包中…");
+    try {
+      var r = await build(); if (!r) { b.disabled = false; return; }
+      var f = new File([r.blob], r.name, { type: "application/zip" });
+      await navigator.share({ files: [f], title: "台語錄音 " + r.code });
+      say("已送出分享。" + tail(r.missing));
+    } catch (e) {
+      if (e && e.name === "AbortError") say("你取消了分享。");
+      else say("分享沒有成功，請改按「打包並存到手機」。", true);
+    }
+    b.disabled = false;
+  });
+
+  window.addEventListener("pagehide", function () { if (stream) stream.getTracks().forEach(function (t) { t.stop(); }); });
+  window.__taigi = { recs: recs, save: save };   /* used only for local checks */
+})();
+</script>
+</body>
+</html>
