@@ -165,6 +165,15 @@
       <button class="btn" id="share" type="button" hidden>打包並用 LINE 等 App 分享</button>
     </p>
     <p id="msg" style="margin-top:12px" role="status"></p>
+    <div class="note" id="findfile" hidden>
+      <strong>檔案存好了，怎麼傳給我？</strong>
+      <ol>
+        <li>檔案名稱是 <code id="fname"></code>，存在手機的「<strong>下載</strong>」資料夾。</li>
+        <li>剛存好時，畫面最上方會跳出「已完成下載」，點旁邊的「<strong>開啟</strong>」可以直接看到它。</li>
+        <li>用 <strong>LINE</strong> 傳：打開和邀請你的人的聊天室，按左下角「＋」，選「<strong>檔案</strong>」，再選「<strong>下載</strong>」資料夾，找到 <span id="fname2"></span>（最新的會排在最前面），按傳送。</li>
+        <li>找不到的話，打開手機的「<strong>檔案</strong>」App（或「檔案管理」），點「下載」就會看到。</li>
+      </ol>
+    </div>
   </section>
 
   <section class="faq" style="display:flex;flex-direction:column;gap:10px">
@@ -394,6 +403,10 @@
     var blob = await zip.generateAsync({ type: "blob", compression: "STORE" });
     return { blob: blob, name: code + ".zip", missing: missing, code: code };
   }
+  function showFind(name) {
+    $("fname").textContent = name; $("fname2").textContent = name;
+    var f = $("findfile"); f.hidden = false; f.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
   function tail(m) { return m.length ? "（還有 " + m.length + " 句沒錄，之後可以補錄再打包一次。）" : ""; }
   $("zip").addEventListener("click", async function () {
     var b = this; b.disabled = true; say("打包中…");
@@ -402,7 +415,7 @@
       var u = URL.createObjectURL(r.blob), a = document.createElement("a");
       a.href = u; a.download = r.name; document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(u); }, 60000);
-      say("已打包 " + r.name + "，請到「下載」找到它，再傳給邀請你的人。" + tail(r.missing));
+      say("已打包 " + r.name + "。" + tail(r.missing)); showFind(r.name);
     } catch (e) { say("打包失敗：" + (e && e.message || e), true); }
     b.disabled = false;
   });
@@ -421,7 +434,7 @@
         var u = URL.createObjectURL(r.blob), a = document.createElement("a");
         a.href = u; a.download = r.name; document.body.appendChild(a); a.click(); a.remove();
         setTimeout(function () { URL.revokeObjectURL(u); }, 60000);
-        say("這支手機不能直接分享檔案，已改成存到手機：" + r.name + "。請到「下載」找到它，再用 LINE 或其他 App 傳給邀請你的人。" + tail(r.missing));
+        say("這支手機不能直接分享檔案，已改成存到手機：" + r.name + "。" + tail(r.missing)); showFind(r.name);
       } else say("分享沒有成功，請改按「打包並存到手機」。", true);
     }
     b.disabled = false;
