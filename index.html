@@ -94,10 +94,10 @@
   <section class="box">
     <h2>你的錄音會去哪裡</h2>
     <ul>
-      <li>錄音<strong>只存在你這支手機的瀏覽器裡</strong>。這個網頁沒有伺服器接收錄音，也沒有任何自動上傳。</li>
-      <li>最後你自己按「打包」，存成一個檔案，再<strong>自己決定要傳給誰</strong>（請傳給邀請你的人）。</li>
-      <li>網頁沒有統計工具，也不載入外部程式。頁面由 GitHub Pages 提供，GitHub 可能記錄一般的連線資訊，但錄音不會經過它。</li>
-      <li>想反悔很簡單：每一句都可以刪除；關掉網頁、清除瀏覽器資料，錄音就沒了；還沒傳給對方之前，什麼都不會離開你的手機。</li>
+      <li>錄音在你按「送出」之前，<strong>只存在你這支手機的瀏覽器裡</strong>，不會自動上傳。</li>
+      <li>你按「送出」之後，錄音會傳到<strong>作者個人的 Google 雲端硬碟</strong>，只有作者看得到。你也可以改成存成檔案，自己決定傳給誰。</li>
+      <li>網頁沒有統計工具，也不載入外部程式。頁面由 GitHub Pages 提供，GitHub 可能記錄一般的連線資訊，但錄音不會經過它。送出時，錄音是經由 Google 傳到作者的雲端硬碟。</li>
+      <li>想反悔很簡單：每一句都可以刪除；關掉網頁、清除瀏覽器資料，錄音就沒了；還沒按「送出」之前，什麼都不會離開你的手機。送出之後想撤回，請告訴作者，作者會刪掉。</li>
       <li>上面填的代號、年齡層和成長縣市，加上打包時<strong>自動帶入的手機型號與瀏覽器版本</strong>，只用來分析辨識結果（例如年長者或不同地區的口音準不準、哪種手機收音差），不會公開，也不會用來找出你是誰。代號、年齡層和縣市都可以不填。</li>
       <li>錄音裡只會有你的聲音和背景聲。請不要唸出自己或別人的真實個資。</li>
     </ul>
@@ -147,18 +147,23 @@
     <div class="meter" aria-hidden="true"><span id="fill"></span></div>
     <span id="count">0 / 20</span>
   </div>
-  <div id="all">20 句全部錄完了，請往下按「打包」。</div>
+  <div id="all">20 句全部錄完了，請往下按「送出給作者」。</div>
 
   <div id="list" style="display:flex;flex-direction:column;gap:28px"></div>
 
   <section class="box" id="pack">
-    <h2>打包給邀請你的人</h2>
-    <p>按下面的按鈕，會把所有錄音打包成一個 <code>.zip</code> 檔存在手機裡。然後請用 LINE 或 Google 雲端硬碟，把這個檔案傳給邀請你的人。沒錄完也可以先打包，之後補錄再打包一次。</p>
-    <p style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap">
-      <button class="btn main" id="zip" type="button">打包並存到手機</button>
-      <button class="btn" id="share" type="button" hidden>打包並用 LINE 等 App 分享</button>
+    <h2>錄完了，送出</h2>
+    <p>按下面的按鈕，錄音就會直接傳給作者，不用找檔案。沒錄完也可以先送出，之後補錄再送一次，重複的句子會被新的取代。</p>
+    <p style="margin-top:14px">
+      <button class="btn main" id="send" type="button" hidden>送出給作者</button>
     </p>
     <p id="msg" style="margin-top:12px" role="status"></p>
+    <details id="fallback" style="margin-top:14px"><summary>送不出去的話，改存成檔案</summary>
+    <p style="margin-top:10px">會把所有錄音打包成一個 <code>.zip</code> 檔存在手機裡，再請你用 LINE 或 Google 雲端硬碟傳給邀請你的人。</p>
+    <p style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap">
+      <button class="btn" id="zip" type="button">打包並存到手機</button>
+      <button class="btn" id="share" type="button" hidden>打包並用 LINE 等 App 分享</button>
+    </p>
     <div class="note" id="findfile" hidden>
       <strong>檔案存好了，怎麼傳給我？</strong>
       <ol>
@@ -168,6 +173,7 @@
         <li>找不到的話，打開手機的「<strong>檔案</strong>」App（或「檔案管理」），點「下載」就會看到。</li>
       </ol>
     </div>
+    </details>
   </section>
 
   <section class="faq" style="display:flex;flex-direction:column;gap:10px">
@@ -178,12 +184,12 @@
       <div><p>請把上面的「改成按一下開始，再按一下結束」打勾，這樣就不用一直按住。</p></div></details>
     <details><summary>我中途離開，錄音會不見嗎</summary>
       <div><p>通常不會。錄音和勾選會留在這支手機的瀏覽器裡，下次用同一個瀏覽器打開同一個連結就會看到。但如果你清除了瀏覽器資料，或用「無痕模式」，就會消失。</p></div></details>
-    <details><summary>打包存檔後找不到檔案</summary>
-      <div><p>Android 通常在「下載」資料夾。iPhone 在「檔案」App 的「下載項目」。也可以改按「用 LINE 等 App 分享」，直接選要傳給誰。</p></div></details>
+    <details><summary>按了「送出給作者」說失敗</summary>
+      <div><p>先確認有連上 Wi-Fi 或行動網路，再按一次。錄音還在你的手機裡，不會不見。還是不行的話，打開下面「送不出去的話，改存成檔案」，存成檔案再傳給邀請你的人。</p></div></details>
     <details><summary>檔案很大嗎</summary>
       <div><p>20 句大約幾 MB 到十幾 MB，用 Wi-Fi 傳比較不吃流量。</p></div></details>
     <details><summary>我不想錄了</summary>
-      <div><p>直接關掉網頁就好。沒有按打包、沒有傳給任何人，就沒有任何東西離開你的手機。</p></div></details>
+      <div><p>直接關掉網頁就好。沒有按「送出給作者」、沒有傳給任何人，就沒有任何東西離開你的手機。</p></div></details>
   </section>
 </main>
 <div id="status" role="status" aria-live="polite"></div>
@@ -395,7 +401,7 @@
     if (m) return m[1] + "（iOS " + m[2].replace(/_/g, ".") + "，型號無法偵測）";
     return "未知";
   }
-  async function build() {
+  function getCode() {
     var code = $("code").value.trim().replace(/[^A-Za-z0-9]/g, "");
     if (!code) {
       code = lsGet("taigi-rand");
@@ -406,15 +412,25 @@
         lsSet("taigi-rand", code);
       }
     }
-    var ids = Object.keys(recs).sort();
-    if (!ids.length) { say("還沒有錄音。", true); return null; }
-    var zip = new JSZip(), missing = [], types = {};
-    ids.forEach(function (id) { zip.file(code + "_" + id + "." + recs[id].ext, recs[id].blob); types[recs[id].type] = 1; });
+    return code;
+  }
+  async function makeInfo(code, ids) {
+    var missing = [], types = {};
+    ids.forEach(function (id) { types[recs[id].type] = 1; });
     for (var i = 1; i <= TOTAL; i++) { var k = String(i).padStart(2, "0"); if (!recs[k]) missing.push(k); }
     var info = "代號: " + code + "\n年齡層: " + $("age").value + "\n成長縣市: " + $("home").value + "\n手機: " + await deviceName() + "\n已錄: " + ids.length + " / " + TOTAL +
                "\n未錄的句號: " + (missing.join(", ") || "無") + "\n格式: " + Object.keys(types).join(", ") +
                "\n時間: " + new Date().toISOString() + "\n瀏覽器: " + ua + "\n";
-    zip.file(code + "_info.txt", info);
+    return { info: info, missing: missing };
+  }
+  async function build() {
+    var code = getCode();
+    var ids = Object.keys(recs).sort();
+    if (!ids.length) { say("還沒有錄音。", true); return null; }
+    var zip = new JSZip();
+    ids.forEach(function (id) { zip.file(code + "_" + id + "." + recs[id].ext, recs[id].blob); });
+    var mi = await makeInfo(code, ids), missing = mi.missing;
+    zip.file(code + "_info.txt", mi.info);
     var blob = await zip.generateAsync({ type: "blob", compression: "STORE" });
     var d = new Date(), p2 = function (n) { return String(n).padStart(2, "0"); };
     var stamp = p2(d.getMonth() + 1) + p2(d.getDate()) + "-" + p2(d.getHours()) + p2(d.getMinutes());
@@ -425,6 +441,47 @@
     var f = $("findfile"); f.hidden = false; f.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }
   function tail(m) { return m.length ? "（還有 " + m.length + " 句沒錄，之後可以補錄再打包一次。）" : ""; }
+  /* ---- 直接送出到作者的雲端硬碟（Google Apps Script，見 apps_script/Code.gs） ---- */
+  var UPLOAD_URL = "https://script.google.com/macros/s/AKfycbwuIO1E6dlNZcpLZqtjl8j92drtqvhQquPpm0FNPlWDkJlD9eSPLE2yfiYwthvMQEQZDw/exec";
+  function toB64(blob) {
+    return new Promise(function (res, rej) {
+      var fr = new FileReader();
+      fr.onload = function () { res(String(fr.result).split(",")[1] || ""); };
+      fr.onerror = function () { rej(fr.error); };
+      fr.readAsDataURL(blob);
+    });
+  }
+  async function putFile(code, name, mime, blob) {
+    var resp = await fetch(UPLOAD_URL, {
+      method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ code: code, name: name, mime: mime, b64: await toB64(blob) })
+    });
+    var j = await resp.json();
+    if (!j.ok) throw new Error(j.error || "server");
+  }
+  var sendBtn = $("send");
+  if (UPLOAD_URL) sendBtn.hidden = false;
+  sendBtn.addEventListener("click", async function () {
+    var b = this, ids = Object.keys(recs).sort();
+    if (!ids.length) { say("還沒有錄音。", true); return; }
+    b.disabled = true;
+    var code = getCode(), n = 0;
+    try {
+      for (var i = 0; i < ids.length; i++) {
+        say("送出中… " + (i + 1) + " / " + ids.length);
+        await putFile(code, code + "_" + ids[i] + "." + recs[ids[i]].ext, recs[ids[i]].type, recs[ids[i]].blob);
+        n++;
+      }
+      var mi = await makeInfo(code, ids);
+      await putFile(code, code + "_info.txt", "text/plain", new Blob([mi.info], { type: "text/plain" }));
+      say("已送出 " + n + " 句，謝謝你！" + tail(mi.missing).replace("打包", "送出"));
+    } catch (e) {
+      say("送出沒有成功（已送 " + n + " 句）。請確認網路後再按一次，錄音還在你的手機裡。還是不行就打開下面「送不出去的話，改存成檔案」。", true);
+      $("fallback").open = true;
+    }
+    b.disabled = false;
+  });
+
   $("zip").addEventListener("click", async function () {
     var b = this; b.disabled = true; say("打包中…");
     try {
