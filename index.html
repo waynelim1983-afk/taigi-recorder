@@ -87,8 +87,8 @@
 
   <section class="box">
     <h2>這是在做什麼</h2>
-    <p>這是一個個人的小專案：做一個能聽懂台語、直接在手機鍵盤上轉成國語文字的語音輸入工具，給家裡不太會打字的長輩用。要知道它聽得準不準，需要不同的人用台語念同樣的句子。你的錄音只拿來測試辨識結果，不會公開。</p>
-    <p>這不是公司、政府或學校的服務，也不是醫療建議。</p>
+    <p><strong>這是我個人剛起步的小專案。</strong>我想做一個語音輸入工具：你用台語說話，直接在手機鍵盤上變成國語文字。它是為了家裡不太會打字的長輩，也為了台灣國語很重、一般語音輸入常常聽不準的人而做的。</p>
+    <p>要知道它聽得準不準，需要不同的人用台語念同樣的句子，所以想請你幫忙錄音。你的錄音只用來測試和改進辨識結果，不會公開。這是個人專案，不是公司、政府或學校的服務。</p>
   </section>
 
   <section class="box">
@@ -98,7 +98,7 @@
       <li>最後你自己按「打包」，存成一個檔案，再<strong>自己決定要傳給誰</strong>（請傳給邀請你的人）。</li>
       <li>網頁沒有統計工具，也不載入外部程式。頁面由 GitHub Pages 提供，GitHub 可能記錄一般的連線資訊，但錄音不會經過它。</li>
       <li>想反悔很簡單：每一句都可以刪除；關掉網頁、清除瀏覽器資料，錄音就沒了；還沒傳給對方之前，什麼都不會離開你的手機。</li>
-      <li>上面填的代號、年齡層、性別、成長縣市和手機型號，<strong>只用來分析辨識結果</strong>（例如年長者或不同地區的口音準不準），不會公開，也不會用來找出你是誰。這些欄位都可以不選，只有代號一定要填。</li>
+      <li>上面填的代號、年齡層和成長縣市，加上打包時<strong>自動帶入的手機型號與瀏覽器版本</strong>，只用來分析辨識結果（例如年長者或不同地區的口音準不準、哪種手機收音差），不會公開，也不會用來找出你是誰。年齡層和縣市可以不選，只有代號一定要填。</li>
       <li>錄音裡只會有你的聲音和背景聲。請不要唸出自己或別人的真實個資。</li>
     </ul>
   </section>
@@ -123,16 +123,10 @@
         <input type="text" id="code" maxlength="8" autocomplete="off" autocapitalize="characters">
       </label>
       <label class="field">年齡層
-        <select id="age"><option value="">請選擇</option><option>20 歲以下</option><option>20–29</option><option>30–39</option><option>40–49</option><option>50–59</option><option>60–69</option><option>70–79</option><option>80 以上</option></select>
-      </label>
-      <label class="field">性別
-        <select id="gender"><option value="">請選擇</option><option>女</option><option>男</option><option>其他／不想說</option></select>
+        <select id="age"><option value="">請選擇</option><option>30 歲以下</option><option>30–49</option><option>50–69</option><option>70 以上</option></select>
       </label>
       <label class="field">主要在哪個縣市長大（口音會受影響）
         <select id="home"><option value="">請選擇</option><option>基隆</option><option>台北</option><option>新北</option><option>桃園</option><option>新竹</option><option>苗栗</option><option>台中</option><option>彰化</option><option>南投</option><option>雲林</option><option>嘉義</option><option>台南</option><option>高雄</option><option>屏東</option><option>宜蘭</option><option>花蓮</option><option>台東</option><option>澎湖</option><option>金門／馬祖</option><option>國外</option></select>
-      </label>
-      <label class="field">你用的手機型號（例如 iPhone 13、Samsung A54）
-        <input type="text" id="phone" maxlength="40" autocomplete="off">
       </label>
     </div>
   </section>
@@ -374,7 +368,7 @@
     var c = this.value.replace(/[^A-Za-z0-9]/g, "");
     if (c !== this.value) { this.value = c; say("代號只能用英文字母和數字，中文和符號會被去掉。", true); }
   });
-  ["code", "age", "gender", "home", "phone"].forEach(function (f) { var el = $(f); el.value = lsGet("taigi-" + f); el.addEventListener("input", function () { lsSet("taigi-" + f, el.value); }); });
+  ["code", "age", "home"].forEach(function (f) { var el = $(f); el.value = lsGet("taigi-" + f); el.addEventListener("input", function () { lsSet("taigi-" + f, el.value); }); });
 
   idbAll().then(function (all) {
     Object.keys(all).forEach(function (id) {
@@ -388,6 +382,19 @@
   /* ---- zip ---- */
   var msg = $("msg");
   function say(t, bad) { msg.textContent = t; msg.className = bad ? "err" : ""; }
+  /* Android Chrome 可取得型號；iPhone 和其他瀏覽器取不到，就記系統名稱 */
+  async function deviceName() {
+    try {
+      var d = navigator.userAgentData;
+      if (d && d.getHighEntropyValues) {
+        var h = await d.getHighEntropyValues(["model", "platform", "platformVersion"]);
+        if (h.model) return h.model + "（" + h.platform + " " + h.platformVersion + "）";
+      }
+    } catch (e) {}
+    var m = ua.match(/(iPhone|iPad)[^)]*OS ([\d_]+)/);
+    if (m) return m[1] + "（iOS " + m[2].replace(/_/g, ".") + "，型號無法偵測）";
+    return "未知";
+  }
   async function build() {
     var code = $("code").value.trim().replace(/[^A-Za-z0-9]/g, "");
     if (!code) { say("請先在上面填「代號」。", true); $("code").focus(); return null; }
@@ -396,7 +403,7 @@
     var zip = new JSZip(), missing = [], types = {};
     ids.forEach(function (id) { zip.file(code + "_" + id + "." + recs[id].ext, recs[id].blob); types[recs[id].type] = 1; });
     for (var i = 1; i <= TOTAL; i++) { var k = String(i).padStart(2, "0"); if (!recs[k]) missing.push(k); }
-    var info = "代號: " + code + "\n年齡層: " + $("age").value + "\n性別: " + $("gender").value + "\n成長縣市: " + $("home").value + "\n手機: " + $("phone").value + "\n已錄: " + ids.length + " / " + TOTAL +
+    var info = "代號: " + code + "\n年齡層: " + $("age").value + "\n成長縣市: " + $("home").value + "\n手機: " + await deviceName() + "\n已錄: " + ids.length + " / " + TOTAL +
                "\n未錄的句號: " + (missing.join(", ") || "無") + "\n格式: " + Object.keys(types).join(", ") +
                "\n時間: " + new Date().toISOString() + "\n瀏覽器: " + ua + "\n";
     zip.file(code + "_info.txt", info);
