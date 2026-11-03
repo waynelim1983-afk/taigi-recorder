@@ -98,7 +98,7 @@
       <li>最後你自己按「打包」，存成一個檔案，再<strong>自己決定要傳給誰</strong>（請傳給邀請你的人）。</li>
       <li>網頁沒有統計工具，也不載入外部程式。頁面由 GitHub Pages 提供，GitHub 可能記錄一般的連線資訊，但錄音不會經過它。</li>
       <li>想反悔很簡單：每一句都可以刪除；關掉網頁、清除瀏覽器資料，錄音就沒了；還沒傳給對方之前，什麼都不會離開你的手機。</li>
-      <li>上面填的代號、年齡層和成長縣市，加上打包時<strong>自動帶入的手機型號與瀏覽器版本</strong>，只用來分析辨識結果（例如年長者或不同地區的口音準不準、哪種手機收音差），不會公開，也不會用來找出你是誰。年齡層和縣市可以不選，只有代號一定要填。</li>
+      <li>上面填的代號、年齡層和成長縣市，加上打包時<strong>自動帶入的手機型號與瀏覽器版本</strong>，只用來分析辨識結果（例如年長者或不同地區的口音準不準、哪種手機收音差），不會公開，也不會用來找出你是誰。代號、年齡層和縣市都可以不填。</li>
       <li>錄音裡只會有你的聲音和背景聲。請不要唸出自己或別人的真實個資。</li>
     </ul>
   </section>
@@ -119,7 +119,7 @@
   <section class="box">
     <h2>先填基本資料</h2>
     <div class="fields">
-      <label class="field">代號（邀請你的人會給你，例如 A1。只能用英文字母和數字，不能用中文）
+      <label class="field">代號（選填。邀請你的人如果有給你，就填在這裡，例如 A1；沒有就留空白。只能用英文字母和數字）
         <input type="text" id="code" maxlength="8" autocomplete="off" autocapitalize="characters">
       </label>
       <label class="field">年齡層
@@ -397,7 +397,15 @@
   }
   async function build() {
     var code = $("code").value.trim().replace(/[^A-Za-z0-9]/g, "");
-    if (!code) { say("請先在上面填「代號」。", true); $("code").focus(); return null; }
+    if (!code) {
+      code = lsGet("taigi-rand");
+      if (!code) {
+        var abc = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+        code = "R";
+        for (var j = 0; j < 4; j++) code += abc.charAt(Math.floor(Math.random() * abc.length));
+        lsSet("taigi-rand", code);
+      }
+    }
     var ids = Object.keys(recs).sort();
     if (!ids.length) { say("還沒有錄音。", true); return null; }
     var zip = new JSZip(), missing = [], types = {};
@@ -408,7 +416,9 @@
                "\n時間: " + new Date().toISOString() + "\n瀏覽器: " + ua + "\n";
     zip.file(code + "_info.txt", info);
     var blob = await zip.generateAsync({ type: "blob", compression: "STORE" });
-    return { blob: blob, name: code + ".zip", missing: missing, code: code };
+    var d = new Date(), p2 = function (n) { return String(n).padStart(2, "0"); };
+    var stamp = p2(d.getMonth() + 1) + p2(d.getDate()) + "-" + p2(d.getHours()) + p2(d.getMinutes());
+    return { blob: blob, name: code + "_" + stamp + ".zip", missing: missing, code: code };
   }
   function showFind(name) {
     $("fname").textContent = name; $("fname2").textContent = name;
